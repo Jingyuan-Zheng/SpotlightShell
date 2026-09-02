@@ -23,7 +23,10 @@ struct RunShellCommandIntent: AppIntent {
     var runMode: ShellRunMode
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Run \(\.$command) in \(\.$runMode) at \(\.$workingDirectory)")
+        // Keep the required command inline in Spotlight. The optional directory
+        // is intentionally omitted from the sentence so Spotlight does not
+        // render it as an unresolved required-looking slot.
+        Summary("Run \(\.$command) in \(\.$runMode)")
     }
 
     func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
