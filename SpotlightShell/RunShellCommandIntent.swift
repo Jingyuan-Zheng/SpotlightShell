@@ -43,12 +43,12 @@ struct RunShellCommandIntent: AppIntent {
                     dialog = report
                 } else {
                     let result = try await BackgroundRunner.run(request)
-                    report = result.report
+                    report = result.dialog
                     dialog = result.dialog
                 }
             case .background:
                 let result = try await BackgroundRunner.run(request)
-                report = result.report
+                report = result.dialog
                 dialog = result.dialog
             case .terminal:
                 try await TerminalRunner.run(request)
