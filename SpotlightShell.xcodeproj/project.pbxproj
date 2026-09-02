@@ -9,6 +9,7 @@
 D6513D7CE373F192604A1AAB = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TerminalRunner.swift"; sourceTree = "<group>"; };
 3369DAFFDF1BFEB15563947E = { isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
 E6FCB72D43E899B64A4957BA = { isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SpotlightShell.entitlements"; sourceTree = "<group>"; };
+ABCD12340000000000000001 = { isa = PBXFileReference; lastKnownFileType = image.icns; path = "Terminal.icns"; sourceTree = "<group>"; };
 D16D3C0DD59AA924B1D347BD = { isa = PBXBuildFile; fileRef = 2DC0D4FFA0DB328EA1790203; };
 525F17CCD4069194DDBF344C = { isa = PBXBuildFile; fileRef = 2AC4B31622D607533609EDC9; };
 6CEF5363612C174E82A5AEA7 = { isa = PBXBuildFile; fileRef = 2BB116F4A880C9031E4A81B2; };
@@ -20,17 +21,18 @@ C8DFD7D23844BD6EEF2FE37E = { isa = PBXBuildFile; fileRef = D6513D7CE373F192604A1
 CA6E17C2F9343C653973D363 = { isa = PBXBuildFile; fileRef = 2BB116F4A880C9031E4A81B2; };
 D85010D5BF6C414781DAD157 = { isa = PBXBuildFile; fileRef = 2AC4B31622D607533609EDC9; };
 4BBF757D00021802D0999CCF = { isa = PBXBuildFile; fileRef = D6513D7CE373F192604A1AAB; };
+ABCD12340000000000000002 = { isa = PBXBuildFile; fileRef = ABCD12340000000000000001; };
 E05FCB614AB36FDEE72EE1F2 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellTests.swift; sourceTree = "<group>"; };
 80FAC02A0BD5812E2A00F339 = { isa = PBXBuildFile; fileRef = E05FCB614AB36FDEE72EE1F2; };
 8BCD5BC4CDFDF0918087C782 = { isa = PBXFileReference; explicitFileType = wrapper.application; path = SpotlightShell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 F219C0274590DA45E4BEF1EA = { isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = SpotlightShellTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-3A2A88DEEFF3D1D23E496597 = { isa = PBXGroup; children = (2DC0D4FFA0DB328EA1790203,2AC4B31622D607533609EDC9,2BB116F4A880C9031E4A81B2,8329ECC08ABE53A609006CC7,4B0F2F1F5C2FEAF9A2E30956,86AA569621E8ECB14AA605AD,D6513D7CE373F192604A1AAB,3369DAFFDF1BFEB15563947E,E6FCB72D43E899B64A4957BA); path = SpotlightShell; sourceTree = "<group>"; };
+3A2A88DEEFF3D1D23E496597 = { isa = PBXGroup; children = (2DC0D4FFA0DB328EA1790203,2AC4B31622D607533609EDC9,2BB116F4A880C9031E4A81B2,8329ECC08ABE53A609006CC7,4B0F2F1F5C2FEAF9A2E30956,86AA569621E8ECB14AA605AD,D6513D7CE373F192604A1AAB,3369DAFFDF1BFEB15563947E,E6FCB72D43E899B64A4957BA,ABCD12340000000000000001); path = SpotlightShell; sourceTree = "<group>"; };
 8B7A6DECC0651D269EA794C7 = { isa = PBXGroup; children = (E05FCB614AB36FDEE72EE1F2); path = SpotlightShellTests; sourceTree = "<group>"; };
 FBDC4F23F93125BBEEAE800C = { isa = PBXGroup; children = (8BCD5BC4CDFDF0918087C782,F219C0274590DA45E4BEF1EA); name = Products; sourceTree = "<group>"; };
 325F10A6957A34D66CB8C0E4 = { isa = PBXGroup; children = (3A2A88DEEFF3D1D23E496597,8B7A6DECC0651D269EA794C7,FBDC4F23F93125BBEEAE800C); sourceTree = "<group>"; };
 2D764CD838DB39F040AA7EC4 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (D16D3C0DD59AA924B1D347BD,525F17CCD4069194DDBF344C,6CEF5363612C174E82A5AEA7,4224C3069D1ACB3D1C0D7F8A,4A5B9B93F01D8E2309255732,229120FB040F1656F23F6E4F,C8DFD7D23844BD6EEF2FE37E); runOnlyForDeploymentPostprocessing = 0; };
 12384B5908BE5FE5B3301CEE = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
-06F5DC629BD46AAFD46564D1 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+06F5DC629BD46AAFD46564D1 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (ABCD12340000000000000002); runOnlyForDeploymentPostprocessing = 0; };
 9F3002A5D69B22D357A58AA9 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (0D91E23763082AF46193A766,CA6E17C2F9343C653973D363,D85010D5BF6C414781DAD157,4BBF757D00021802D0999CCF,80FAC02A0BD5812E2A00F339); runOnlyForDeploymentPostprocessing = 0; };
 99C7943D90D870A50ADE9160 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 C584AE92222380FB29B6223F = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };

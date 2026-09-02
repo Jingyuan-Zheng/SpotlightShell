@@ -19,7 +19,7 @@ struct RunShellCommandIntent: AppIntent {
                inputOptions: .init(capitalizationType: .none, autocorrect: false, smartQuotes: false, smartDashes: false))
     var workingDirectory: String?
 
-    @Parameter(title: "Run Mode", default: .background)
+    @Parameter(title: "Run Mode", default: .auto)
     var runMode: ShellRunMode
 
     static var parameterSummary: some ParameterSummary {
@@ -36,6 +36,16 @@ struct RunShellCommandIntent: AppIntent {
             let report: String
             let dialog: String
             switch runMode {
+            case .auto:
+                if ShellCommandRouting.prefersTerminal(command) {
+                    try await TerminalRunner.run(request)
+                    report = "Sent to Apple Terminal. Output and exit status are shown there."
+                    dialog = report
+                } else {
+                    let result = try await BackgroundRunner.run(request)
+                    report = result.report
+                    dialog = result.dialog
+                }
             case .background:
                 let result = try await BackgroundRunner.run(request)
                 report = result.report
@@ -55,14 +65,29 @@ struct RunShellCommandIntent: AppIntent {
 }
 
 enum ShellRunMode: String, AppEnum {
+    case auto
     case background
     case terminal
 
     static let typeDisplayRepresentation: TypeDisplayRepresentation = "Run Mode"
     static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
+        .auto: "Auto",
         .background: "Background",
         .terminal: "Terminal"
     ]
+}
+
+enum ShellCommandRouting {
+    static func prefersTerminal(_ command: String) -> Bool {
+        let lower = command.lowercased()
+        let interactive = ["ssh", "vim", "nvim", "nano", "top", "htop", "less", "man", "codex", "sudo", "read", "stty", "tput"]
+        let persistent = ["tail -f", "watch ", "npm run dev", "yarn dev", "pnpm dev", "while true", "sleep infinity"]
+        return interactive.contains { containsCommand(lower, $0) } || persistent.contains { lower.contains($0) }
+    }
+
+    private static func containsCommand(_ text: String, _ name: String) -> Bool {
+        text.split(whereSeparator: { $0 == " " || $0 == "\n" || $0 == ";" || $0 == "|" }).contains { $0 == name }
+    }
 }
 
 struct SpotlightShellShortcuts: AppShortcutsProvider {
