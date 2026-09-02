@@ -94,6 +94,6 @@ struct SpotlightShellShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: RunShellCommandIntent(),
                     phrases: ["Run a shell command with \(.applicationName)"],
-                    shortTitle: "Run Shell Command", systemImageName: "terminal")
+                    shortTitle: "sh", systemImageName: "terminal")
     }
 }
