@@ -43,14 +43,11 @@ struct ShellRequest: Sendable {
         environment["USER"] = NSUserName()
         environment["LOGNAME"] = NSUserName()
         environment["SHELL"] = "/bin/zsh"
-        // Preserve inherited ordering and provide common GUI-launch omissions.
-        var paths = (environment["PATH"] ?? "").split(separator: ":").map(String.init)
-        for path in ["/opt/homebrew/bin", "/opt/homebrew/sbin", "/usr/local/bin",
-                     "/usr/local/sbin", "/usr/bin", "/bin", "/usr/sbin", "/sbin"]
-            where !paths.contains(path) {
-            paths.append(path)
+        // Login startup files own PATH setup (including Homebrew). Preserve any
+        // inherited PATH verbatim; only seed system tools when PATH is absent.
+        if environment["PATH"] == nil {
+            environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin"
         }
-        environment["PATH"] = paths.joined(separator: ":")
         environment["TERM"] = "dumb"
         return environment
     }

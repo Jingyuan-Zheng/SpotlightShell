@@ -4,13 +4,16 @@ import Synchronization
 
 /// A bounded child process, not a service. All blocking POSIX work stays off the main actor.
 enum BackgroundRunner {
-    static func run(_ request: ShellRequest, timeout: TimeInterval = 20) async throws -> CommandResult {
+    // Explicit environment injection lets tests exercise real login startup with
+    // an isolated HOME, without changing process-global environment or dotfiles.
+    static func run(_ request: ShellRequest, timeout: TimeInterval = 20,
+                    environment: [String: String] = ShellRequest.loginEnvironment()) async throws -> CommandResult {
         let cancelled = CancellationState()
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
                 DispatchQueue.global(qos: .userInitiated).async {
                     do {
-                        let result = try execute(request, timeout: timeout, cancelled: cancelled)
+                        let result = try execute(request, timeout: timeout, environment: environment, cancelled: cancelled)
                         continuation.resume(returning: result)
                     } catch {
                         continuation.resume(throwing: error)
@@ -22,7 +25,7 @@ enum BackgroundRunner {
         }
     }
 
-    private static func execute(_ request: ShellRequest, timeout: TimeInterval,
+    private static func execute(_ request: ShellRequest, timeout: TimeInterval, environment: [String: String],
                                 cancelled: CancellationState) throws -> CommandResult {
         if cancelled.value.withLock({ $0 }) { throw CancellationError() }
         let output = try OutputPipe()
@@ -49,8 +52,11 @@ enum BackgroundRunner {
         try check(posix_spawnattr_setflags(&attributes, Int16(POSIX_SPAWN_SETPGROUP
             | POSIX_SPAWN_SETSIGMASK | POSIX_SPAWN_SETSIGDEF | POSIX_SPAWN_CLOEXEC_DEFAULT)))
 
+        // posix_spawn includes argv[0]. Foundation Process's equivalent would be
+        // executableURL = /bin/zsh, arguments = ["-lc", request.command].
+        // Keep command as one argument: no wrapper, escaping, -i, or explicit source.
         let arguments = CStringArray(["/bin/zsh", "-lc", request.command])
-        let environment = CStringArray(ShellRequest.loginEnvironment().map { "\($0.key)=\($0.value)" })
+        let environment = CStringArray(environment.map { "\($0.key)=\($0.value)" })
         var pid: pid_t = 0
         let spawnStatus = arguments.withPointers { argv in
             environment.withPointers { envp in

@@ -85,19 +85,43 @@ final class ShellTests: XCTestCase {
                        FileManager.default.homeDirectoryForCurrentUser)
     }
 
-    func testEnvironmentFallbacksPreserveOrdering() {
+    func testEnvironmentPreservesPathAndProvidesSystemDefault() {
         let environment = ShellRequest.loginEnvironment(["PATH": "/custom/bin:/usr/bin", "CUSTOM": "kept"])
-        XCTAssertTrue(environment["PATH"]!.hasPrefix("/custom/bin:/usr/bin:"))
-        XCTAssertTrue(environment["PATH"]!.contains("/opt/homebrew/bin"))
+        XCTAssertEqual(environment["PATH"], "/custom/bin:/usr/bin")
+        XCTAssertEqual(ShellRequest.loginEnvironment([:])["PATH"], "/usr/bin:/bin:/usr/sbin:/sbin")
+        XCTAssertEqual(ShellRequest.loginEnvironment(["PATH": ""])["PATH"], "")
         XCTAssertEqual(environment["CUSTOM"], "kept")
         XCTAssertEqual(environment["SHELL"], "/bin/zsh")
     }
 
     func testLoginShell() async throws {
         let result = try await BackgroundRunner.run(ShellRequest(
-            command: "[[ -o login ]] && printf '%s\\n' \"$SHELL\"", workingDirectory: nil))
+            command: "[[ -o login && ! -o interactive ]] && printf '%s\\n' \"$SHELL\"; case \"$-\" in *i*) echo interactive;; *) echo noninteractive;; esac", workingDirectory: nil))
         XCTAssertEqual(result.exitStatus, 0)
-        XCTAssertEqual(result.stdout, "/bin/zsh\n")
+        XCTAssertEqual(result.stdout, "/bin/zsh\nnoninteractive\n")
+    }
+
+    func testIsolatedLoginStartupFiles() async throws {
+        let home = FileManager.default.temporaryDirectory
+            .appendingPathComponent("SpotlightShell-profile-\(UUID()) ' $ ` 中文")
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: home) }
+        try "export PROFILE_SEEN=from_zprofile\nexport PATH=\"$HOME/profile-bin:$PATH\"\n"
+            .write(to: home.appendingPathComponent(".zprofile"), atomically: true, encoding: .utf8)
+        try "export INTERACTIVE_SEEN=from_zshrc\n"
+            .write(to: home.appendingPathComponent(".zshrc"), atomically: true, encoding: .utf8)
+        try "export LOGIN_SEEN=from_zlogin\n"
+            .write(to: home.appendingPathComponent(".zlogin"), atomically: true, encoding: .utf8)
+        let environment = ["HOME": home.path, "SHELL": "/bin/zsh", "PATH": "/usr/bin:/bin:/usr/sbin:/sbin"]
+        let command = """
+        [[ -o login && ! -o interactive ]] || exit 9
+        printf '%s\\n' "$PROFILE_SEEN" "${INTERACTIVE_SEEN-unset}" "$LOGIN_SEEN" "${PATH%%:*}"
+        """
+        let result = try await BackgroundRunner.run(
+            ShellRequest(command: command, workingDirectory: "/tmp"), environment: environment)
+        XCTAssertEqual(result.exitStatus, 0, result.report)
+        XCTAssertEqual(result.stdout, "from_zprofile\nunset\nfrom_zlogin\n\(home.path)/profile-bin\n")
+        XCTAssertEqual(result.stderr, "")
     }
 
     func testShellQuotingRoundTrip() async throws {

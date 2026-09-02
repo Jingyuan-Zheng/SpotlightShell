@@ -66,7 +66,7 @@ If the action is missing, first check Shortcuts → Apps → SpotlightShell and 
 
 Executes `/bin/zsh` with separate arguments `-lc` and the exact command. The working directory is a `posix_spawn_file_actions_addchdir` action, never shell source. An omitted/empty directory means the home folder. Accepted explicit paths are absolute paths, `~`, and `~/…`; other relative paths, NULs, missing folders and non-folders are rejected. No `$VARIABLE` expansion or shell quoting is applied to the directory field: enter its actual filesystem path, without surrounding quotes.
 
-The app inherits its launch environment, fills in user identity and common missing PATH entries (including both Homebrew prefixes), then lets login zsh read its normal login startup files. `.zshrc` is not loaded in Background, so interactive aliases/functions or PATH changes defined only there may be unavailable. A user's startup files can still alter PATH, output or directory. No global shell files are modified.
+The app inherits its launch environment, fills in user identity, preserves an inherited PATH verbatim (or supplies only system directories if PATH is absent), then lets login zsh read its normal login startup files. Homebrew setup comes from those files; the app does not append Homebrew directories itself. `.zshrc` is not loaded in Background, so interactive aliases/functions or PATH changes defined only there may be unavailable. A user's startup files can still alter PATH, output or directory. No global shell files are modified.
 
 Stdin is `/dev/null`; stdout and stderr are separate nonblocking pipes. Each stream retains at most 64 KiB, continues draining excess output to avoid deadlock, and explicitly reports truncation. Bytes are decoded as UTF-8 with replacement for invalid sequences. The action returns a Text report with stdout, stderr, numeric exit status and signal where applicable. Its dialog is capped at 3,000 characters; a shortened dialog points to the fuller Text result. Spotlight may further shorten or suppress presentation.
 
@@ -101,3 +101,5 @@ The implementation uses `supportedModes = .background`, replacing deprecated `op
 Apple's [WWDC25 Spotlight/App Intents session](https://developer.apple.com/videos/play/wwdc2025/260/) explains that required parameters without defaults must appear in the parameter summary and the intent must remain discoverable. This project follows that contract. There is no public API used to force Spotlight indexing, assign a Quick Key, supply a custom Spotlight text editor or guarantee an output dialog's display. Those system-owned behaviors must be checked on the installed OS.
 
 See `VERIFICATION.md` for the actual build, test and interactive verification performed on this machine.
+
+For the build-2 login-startup investigation, the exact unchanged spawn invocation, and Debug/Release regression results, see `LOGIN-STARTUP-VERIFICATION.md`.
