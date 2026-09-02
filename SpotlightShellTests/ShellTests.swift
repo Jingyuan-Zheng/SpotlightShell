@@ -124,6 +124,23 @@ final class ShellTests: XCTestCase {
         XCTAssertEqual(result.stderr, "")
     }
 
+    func testLongEnvironmentPointersRemainValidInOptimizedBuilds() async throws {
+        let home = FileManager.default.temporaryDirectory
+            .appendingPathComponent("SpotlightShell-long-env-\(UUID())")
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: home) }
+        try "export PROFILE_SEEN=ok\nexport PATH=\"$HOME/profile-bin:$PATH\"\n"
+            .write(to: home.appendingPathComponent(".zprofile"), atomically: true, encoding: .utf8)
+        let inheritedPath = (0..<80).map { "/tmp/path-entry-\($0)-xxxxxxxxxxxxxxxx" }.joined(separator: ":")
+        let environment = ["HOME": home.path, "SHELL": "/bin/zsh", "PATH": inheritedPath]
+        let result = try await BackgroundRunner.run(
+            ShellRequest(command: "[[ -o login && ! -o interactive ]] && printf '%s\\n' \"$PROFILE_SEEN\" \"${PATH#*:}\"", workingDirectory: "/tmp"),
+            environment: environment)
+        XCTAssertEqual(result.exitStatus, 0, result.report)
+        XCTAssertTrue(result.stdout.hasPrefix("ok\n"), result.stdout)
+        XCTAssertTrue(result.stdout.contains("/tmp/path-entry-0-xxxxxxxxxxxxxxxx"))
+    }
+
     func testShellQuotingRoundTrip() async throws {
         let original = "spaces ' \" $HOME $(printf injected) `printf injected` \\ 中文\nend"
         let result = try await BackgroundRunner.run(ShellRequest(

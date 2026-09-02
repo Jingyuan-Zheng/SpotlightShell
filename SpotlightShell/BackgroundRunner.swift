@@ -58,9 +58,16 @@ enum BackgroundRunner {
         let arguments = CStringArray(["/bin/zsh", "-lc", request.command])
         let environment = CStringArray(environment.map { "\($0.key)=\($0.value)" })
         var pid: pid_t = 0
-        let spawnStatus = arguments.withPointers { argv in
-            environment.withPointers { envp in
-                posix_spawn(&pid, "/bin/zsh", &actions, &attributes, argv, envp)
+        // The POSIX call borrows both pointer arrays. Keep the owning Swift
+        // objects alive for the entire nested call; this is significant in
+        // optimized builds where ARC may otherwise release them early.
+        let spawnStatus = withExtendedLifetime(arguments) {
+            withExtendedLifetime(environment) {
+                arguments.withPointers { argv in
+                    environment.withPointers { envp in
+                        posix_spawn(&pid, "/bin/zsh", &actions, &attributes, argv, envp)
+                    }
+                }
             }
         }
         try check(spawnStatus)
