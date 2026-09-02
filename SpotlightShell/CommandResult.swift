@@ -26,7 +26,13 @@ struct CommandResult: Sendable {
     }
 
     var dialog: String {
-        let text = report
+        let text: String
+        if exitStatus == 0, !timedOut, stderr.isEmpty {
+            // Match ordinary Terminal output for the common successful case.
+            text = stdout
+        } else {
+            text = report
+        }
         return text.count <= 3_000 ? text : String(text.prefix(3_000))
             + "\n[Display shortened; the action's Text result contains the captured report.]"
     }
