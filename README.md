@@ -2,7 +2,7 @@
 
 [中文说明](README.zh-Hans.md) · [MIT License](LICENSE)
 
-A small native macOS 26+ app that exposes **Run Shell Command** to Spotlight and Shortcuts. The command is a runtime `String`; there is no command catalog. Swift 6, AppKit, AppIntents, Foundation and Darwin only. No dependencies, main window, Dock icon, status item, helper, login item or service.
+A small native macOS 26+ app that exposes **Run Shell Command** to Spotlight and Shortcuts. The command is a runtime `String`; there is no command catalog. Swift 6, AppKit, AppIntents, Foundation and Darwin only.
 
 ![Spotlight discovers the action](Screenshots/spotlight-discovery.png)
 
@@ -38,22 +38,20 @@ else
 fi
 ```
 
-Opening SpotlightShell from its application icon presents the standard macOS **About SpotlightShell** panel. It displays the icon, name and version from `Info.plist`, with centered links to the author’s website and this repository. Closing the panel quits the accessory app, so it leaves no Dock indicator. Spotlight and Shortcuts instead launch it on demand: each intent keeps it alive while executing, then it exits about five seconds after the last action completes. Registration comes from Xcode's extracted `Metadata.appintents` in the app bundle, not from a permanently running process.
+Opening SpotlightShell from its application icon presents the standard macOS **About SpotlightShell** panel. It displays the icon, name and version from `Info.plist`, with centered links to the author’s website and this repository.
 
 ## Spotlight setup and interactive verification
 
 1. Install and open the app once. Allow macOS time to discover it.
 2. Press **Command-Space**, then **Command-3** to filter to Actions.
 3. Search for **Run Shell Command** (or **SpotlightShell**) and select the SpotlightShell action.
-4. Enter `printf "hello\n"` in **Command**, keep **Run Mode** at **Auto**, and leave **Working Directory** empty. `Auto` is intentionally an interactive parameter. While Spotlight is editing its parameter UI, choose the **Run Shell Command** row (or its play button) to submit; Return can remain in the editor rather than invoke the action. The report should show exit status 0 and `hello` under stdout.
-5. Run `pwd` with a directory such as `/tmp`. Run `echo "$SHELL"`; expect `/bin/zsh`.
+4. Enter `printf "hello\n"` in **Command**, keep **Run Mode** at **Auto**, then choose the **Run Shell Command** row (or its play button) to submit. The report should show exit status 0 and `hello` under stdout.
+5. Run `pwd`, then `echo "$SHELL"`; expect `/bin/zsh`.
 6. Try `printf 'example error\n' >&2; exit 7`. The result must include stderr and exit status 7.
 7. Select **Terminal** explicitly. Run `printf "hello\n"; tty`, then test an interactive program such as `top` (quit with `q`). macOS may ask to let SpotlightShell control Terminal. Approve only if you want Terminal mode.
 8. Wait for SpotlightShell to exit, then repeat a Background action to check cold launch. Terminal remains open independently after handoff.
 
-The parameter summary includes command, mode and optional directory inline. Spotlight controls the exact field layout, output display and indexing delay; the app cannot force those UI details. In Shortcuts the same action returns a Text report that can feed **Show Result**. No saved shortcut is required for the primary Spotlight action. If your OS build does not expose optional fields conveniently, configure the same action in Shortcuts with the desired mode/directory and Command set to Ask Each Time; this is a fallback, not a replacement for the runtime parameter.
-
-The screenshots above show discovery, the interactive run-mode picker, and output from `printf "Hello from SpotlightShell\\n"`.
+In Shortcuts the same action returns a Text report that can feed **Show Result**. The screenshots above show discovery, the run-mode picker, and output from `printf "Hello from SpotlightShell\\n"`.
 
 To assign `sh`, find the action and click **Add quick keys** beside it, type `sh`, then confirm. If a key is already assigned, edit its field. Invoke with Command-Space, type `sh`, fill the command field and press Return. Quick Keys belong to the user's Spotlight configuration; SpotlightShell never sets them. Apple documents Actions, filling parameters, and assigning Quick Keys in [Take actions and shortcuts in Spotlight](https://support.apple.com/guide/mac-help/mchl4953dfeb/mac).
 
