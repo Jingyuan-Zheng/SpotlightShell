@@ -37,7 +37,7 @@ Launching produces no window. The app refreshes App Shortcut metadata and exits 
 1. Install and open the app once. Allow macOS time to discover it.
 2. Press **Command-Space**, then **Command-3** to filter to Actions.
 3. Search for **Run Shell Command** (or **SpotlightShell**) and select the SpotlightShell action.
-4. Enter `printf "hello\n"` in **Command**. Keep **Run Mode** at **Background** and leave **Working Directory** empty. Press Return to run it. The command field is single-line so Spotlight retains its standard Return-to-run behavior; paste a multi-line command if needed. The report should show exit status 0 and `hello` under stdout.
+4. Enter `printf "hello\n"` in **Command**, then press Return to run it. Spotlight shows the default **Auto** mode as text so Return runs immediately. To choose **Background** or **Terminal**, configure the same action in Shortcuts. The command field is single-line; paste a multi-line command if needed. The report should show exit status 0 and `hello` under stdout.
 5. Run `pwd` with a directory such as `/tmp`. Run `echo "$SHELL"`; expect `/bin/zsh`.
 6. Try `printf 'example error\n' >&2; exit 7`. The result must include stderr and exit status 7.
 7. Select **Terminal** explicitly. Run `printf "hello\n"; tty`, then test an interactive program such as `top` (quit with `q`). macOS may ask to let SpotlightShell control Terminal. Approve only if you want Terminal mode.
