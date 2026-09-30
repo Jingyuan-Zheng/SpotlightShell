@@ -107,5 +107,3 @@ Implemented against Xcode 26.2 (17C52), SDK macOS 26.2; deployment target macOS 
 The implementation uses `supportedModes = .background`, replacing deprecated `openAppWhenRun`. This keeps **SpotlightShell** in the background even when the user chooses to open **Terminal**. These are different concepts. The provider's phrase includes the required application-name placeholder; free-form command text belongs in the intent parameter, not in a predefined App Shortcut phrase parameter.
 
 Apple's [WWDC25 Spotlight/App Intents session](https://developer.apple.com/videos/play/wwdc2025/260/) explains that required parameters without defaults must appear in the parameter summary and the intent must remain discoverable. This project follows that contract. There is no public API used to force Spotlight indexing, assign a Quick Key, supply a custom Spotlight text editor or guarantee an output dialog's display. Those system-owned behaviors must be checked on the installed OS.
-
-See `VERIFICATION.md` for portable build and test verification.
