@@ -65,7 +65,7 @@ struct RunShellCommandIntent: AppIntent {
 }
 
 enum ShellRunMode: String, AppEnum {
-    case auto
+    case auto = "Auto"
     case background
     case terminal
 
