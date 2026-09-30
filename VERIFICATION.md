@@ -1,11 +1,9 @@
-# Verification — 2 September 2026
+# Verification
 
 ## Delivered
 
-- Repository: `/Users/jingyuan/Github/SpotlightShell` (the user's Github folder is a OneDrive symlink).
-- Installed app: `/Users/jingyuan/Applications/SpotlightShell.app`.
-- Native application and shared Xcode scheme, seven Swift source files, Info.plist, one app entitlement, 14 XCTest cases, README and .gitignore.
-- macOS 26.0 deployment target. Verified using macOS 26.6.2 (25G83), Xcode 26.2 (17C52), macOS SDK 26.2.
+- Native application and shared Xcode scheme, Swift source files, Info.plist, one app entitlement, XCTest coverage, documentation and .gitignore.
+- macOS 26.0 deployment target, verified with an Xcode 26 macOS SDK.
 
 ## Actually verified
 
@@ -13,7 +11,7 @@
 | --- | --- |
 | Debug and Release compilation with xcodebuild | Passed; universal arm64 and x86_64 app |
 | Swift compiler diagnostics in final app builds | No compiler errors or warnings |
-| App exists and signature verifies | Passed; Apple Development signature, team F4575K29KQ, Hardened Runtime enabled |
+| App exists and signature verifies | Passed with Hardened Runtime enabled |
 | Installed app entitlements | Only `com.apple.security.automation.apple-events`; no App Sandbox |
 | Extracted App Intents metadata | Runtime required String command, optional String directory, Background/Terminal enum, all three inline summary fields, discoverable intent and App Shortcut |
 | LaunchServices | Installed application registered with identifier `dev.jingyuan.SpotlightShell` |
@@ -42,7 +40,7 @@ xcodebuild -project SpotlightShell.xcodeproj -scheme SpotlightShell \
   -configuration Release -derivedDataPath build \
   -destination 'generic/platform=macOS' CODE_SIGNING_ALLOWED=NO build
 
-codesign --force --sign 'Apple Development: mr.jingyuan.zheng@icloud.com (FYJ3J7XP24)' \
+codesign --force --sign 'Apple Development: YOUR_IDENTITY' \
   --options runtime --entitlements SpotlightShell/SpotlightShell.entitlements \
   --timestamp=none build/Build/Products/Release/SpotlightShell.app
 

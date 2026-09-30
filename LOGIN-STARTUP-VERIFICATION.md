@@ -45,7 +45,7 @@ These changes improve the startup contract and prevent PATH fallback from maskin
    ```text
    login=on
    noninteractive
-   HOME=/Users/jingyuan
+   HOME=/Users/example
    ZDOTDIR_set=0
    /opt/homebrew/bin/brew
    Homebrew 6.0.21-26-g9368622
@@ -55,7 +55,7 @@ These changes improve the startup contract and prevent PATH fallback from maskin
 4. Final Debug app build: succeeded for arm64 and x86_64. All 15 Debug tests passed, 0 failures (10.1 seconds).
 5. Final Release app/test build: succeeded for arm64 and x86_64. All 15 Release tests passed, 0 failures (8.2 seconds).
 6. Existing tests still cover separate stdout/stderr, nonzero status, timeout, cancellation, child cleanup, output limits, working-directory quoting, shell syntax and Terminal payload handling.
-7. Installed app: `/Users/jingyuan/Applications/SpotlightShell.app`, build 2, Apple Development signing team `F4575K29KQ`, Hardened Runtime enabled. Strict signature verification passed. macOS completed indexing, accepted the app on its autoShortcut and mediator connections, and the app exited after approximately 16 seconds; no SpotlightShell process remained.
+7. An installed development-signed build with Hardened Runtime passed strict signature verification. macOS completed indexing and the app exited after its idle period; no SpotlightShell process remained.
 
 No user dotfiles, Terminal preferences or Spotlight settings were changed. No interactive shell was added to Background mode. Terminal mode retains its existing interactive behavior.
 

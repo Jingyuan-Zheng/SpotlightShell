@@ -1,6 +1,14 @@
 # SpotlightShell
 
+[中文说明](README.zh-Hans.md) · [MIT License](LICENSE)
+
 A small native macOS 26+ app that exposes **Run Shell Command** to Spotlight and Shortcuts. The command is a runtime `String`; there is no command catalog. Swift 6, AppKit, AppIntents, Foundation and Darwin only. No dependencies, main window, Dock icon, status item, helper, login item or service.
+
+![Spotlight discovers the action](Screenshots/spotlight-discovery.png)
+
+![Choose Auto, Background, or Terminal](Screenshots/mode-picker.png)
+
+![A command result in Spotlight](Screenshots/result.png)
 
 ## Build and install
 
@@ -16,7 +24,7 @@ xcodebuild -project SpotlightShell.xcodeproj -scheme SpotlightShell \
   -derivedDataPath build test
 ```
 
-The app is `build/Build/Products/Debug/SpotlightShell.app`. The app target is configured for the Apple Development identity and team already present on this Mac. On another Mac, select your own team/identity in Signing & Capabilities. Ad-hoc signing can compile the app but macOS 26.6.2 rejected its runtime App Shortcut refresh because it had no signing team; use a real Apple development signature for Spotlight testing. Tests are an unhosted XCTest bundle that compile the same execution sources; they do not send Apple Events, launch Terminal, or change privacy settings.
+The app is `build/Build/Products/Debug/SpotlightShell.app`. On another Mac, select your own signing team/identity in Signing & Capabilities. Ad-hoc signing can compile the app but may not reliably refresh its runtime App Shortcut; use a real Apple development signature for Spotlight testing. Tests are an unhosted XCTest bundle that compile the same execution sources; they do not send Apple Events, launch Terminal, or change privacy settings.
 
 To install without replacing an existing app:
 
@@ -30,20 +38,22 @@ else
 fi
 ```
 
-Launching produces no window. The app refreshes App Shortcut metadata and exits after 15 idle seconds. Each intent keeps it alive while executing; it exits about five seconds after the last action completes, allowing the system to receive the result. macOS launches it again on demand. Registration comes from Xcode's extracted `Metadata.appintents` in the app bundle, not from a permanently running process.
+Opening SpotlightShell from its application icon presents the standard macOS **About SpotlightShell** panel. It displays the icon, name and version from `Info.plist`, with centered links to the author’s website and this repository. Closing the panel quits the accessory app, so it leaves no Dock indicator. Spotlight and Shortcuts instead launch it on demand: each intent keeps it alive while executing, then it exits about five seconds after the last action completes. Registration comes from Xcode's extracted `Metadata.appintents` in the app bundle, not from a permanently running process.
 
 ## Spotlight setup and interactive verification
 
 1. Install and open the app once. Allow macOS time to discover it.
 2. Press **Command-Space**, then **Command-3** to filter to Actions.
 3. Search for **Run Shell Command** (or **SpotlightShell**) and select the SpotlightShell action.
-4. Enter `printf "hello\n"` in **Command**. Keep **Run Mode** at **Background** and leave **Working Directory** empty. Press Return to run it. The command field is single-line so Spotlight retains its standard Return-to-run behavior; paste a multi-line command if needed. The report should show exit status 0 and `hello` under stdout.
+4. Enter `printf "hello\n"` in **Command**, keep **Run Mode** at **Auto**, and leave **Working Directory** empty. `Auto` is intentionally an interactive parameter. While Spotlight is editing its parameter UI, choose the **Run Shell Command** row (or its play button) to submit; Return can remain in the editor rather than invoke the action. The report should show exit status 0 and `hello` under stdout.
 5. Run `pwd` with a directory such as `/tmp`. Run `echo "$SHELL"`; expect `/bin/zsh`.
 6. Try `printf 'example error\n' >&2; exit 7`. The result must include stderr and exit status 7.
 7. Select **Terminal** explicitly. Run `printf "hello\n"; tty`, then test an interactive program such as `top` (quit with `q`). macOS may ask to let SpotlightShell control Terminal. Approve only if you want Terminal mode.
 8. Wait for SpotlightShell to exit, then repeat a Background action to check cold launch. Terminal remains open independently after handoff.
 
 The parameter summary includes command, mode and optional directory inline. Spotlight controls the exact field layout, output display and indexing delay; the app cannot force those UI details. In Shortcuts the same action returns a Text report that can feed **Show Result**. No saved shortcut is required for the primary Spotlight action. If your OS build does not expose optional fields conveniently, configure the same action in Shortcuts with the desired mode/directory and Command set to Ask Each Time; this is a fallback, not a replacement for the runtime parameter.
+
+The screenshots above show discovery, the interactive run-mode picker, and output from `printf "Hello from SpotlightShell\\n"`.
 
 To assign `sh`, find the action and click **Add quick keys** beside it, type `sh`, then confirm. If a key is already assigned, edit its field. Invoke with Command-Space, type `sh`, fill the command field and press Return. Quick Keys belong to the user's Spotlight configuration; SpotlightShell never sets them. Apple documents Actions, filling parameters, and assigning Quick Keys in [Take actions and shortcuts in Spotlight](https://support.apple.com/guide/mac-help/mchl4953dfeb/mac).
 
@@ -100,6 +110,4 @@ The implementation uses `supportedModes = .background`, replacing deprecated `op
 
 Apple's [WWDC25 Spotlight/App Intents session](https://developer.apple.com/videos/play/wwdc2025/260/) explains that required parameters without defaults must appear in the parameter summary and the intent must remain discoverable. This project follows that contract. There is no public API used to force Spotlight indexing, assign a Quick Key, supply a custom Spotlight text editor or guarantee an output dialog's display. Those system-owned behaviors must be checked on the installed OS.
 
-See `VERIFICATION.md` for the actual build, test and interactive verification performed on this machine.
-
-For the build-2 login-startup investigation, the exact unchanged spawn invocation, and Debug/Release regression results, see `LOGIN-STARTUP-VERIFICATION.md`.
+See `VERIFICATION.md` for portable build and test verification.

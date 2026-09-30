@@ -7,6 +7,10 @@ final class AppLifetime {
     private var idleTask: Task<Void, Never>?
 
     func launched() { scheduleExit(after: 15) }
+    func holdForAboutPanel() {
+        idleTask?.cancel()
+        idleTask = nil
+    }
     func begin() {
         idleTask?.cancel()
         idleTask = nil
