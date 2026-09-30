@@ -23,10 +23,10 @@ struct RunShellCommandIntent: AppIntent {
     var runMode: ShellRunMode
 
     static var parameterSummary: some ParameterSummary {
-        // Keep only the required command inline in Spotlight. Including a
-        // defaulted parameter here makes Spotlight require an explicit click
-        // before Return will run the action.
-        Summary("Run \(\.$command)")
+        // Keep the required command inline in Spotlight. The optional directory
+        // is intentionally omitted from the sentence so Spotlight does not
+        // render it as an unresolved required-looking slot.
+        Summary("Run \(\.$command) in \(\.$runMode)")
     }
 
     func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
