@@ -10,7 +10,7 @@ struct RunShellCommandIntent: AppIntent {
     static let isDiscoverable = true
 
     @Parameter(title: "Command",
-               inputOptions: .init(capitalizationType: .none, multiline: true, autocorrect: false,
+               inputOptions: .init(capitalizationType: .none, multiline: false, autocorrect: false,
                                    smartQuotes: false, smartDashes: false),
                requestValueDialog: "What shell command would you like to run?")
     var command: String
